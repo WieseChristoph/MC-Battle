@@ -18,7 +18,7 @@ public class BattleArena {
     public Location redSpawn;
     public Location blueSpawn;
 
-    private List<Player> specPlayers = new ArrayList<Player>();
+    private List<Player> specPlayers = new ArrayList<>();
     private Player redPlayer = null;
     private Player bluePlayer = null;
 
@@ -26,7 +26,6 @@ public class BattleArena {
     private int blueScore = 0;
 
     public boolean active = false;
-    private int maxRounds = 3;
     private int rounds = 0;
 
     public ItemStack[] armor;
@@ -83,7 +82,8 @@ public class BattleArena {
         winner.setHealth(20L);
 
         rounds++;
-        if(rounds < maxRounds && redScore != (maxRounds/rounds)+1 && blueScore != (maxRounds/rounds)+1) {
+        int maxRounds = 3;
+        if(rounds < maxRounds && redScore != (maxRounds /rounds)+1 && blueScore != (maxRounds /rounds)+1) {
             sendTitleToAll(ChatColor.LIGHT_PURPLE + winner.getName() + ChatColor.GOLD + " won round " + rounds,
                     ChatColor.RED + ""+redScore + ChatColor.WHITE + "/" + ChatColor.BLUE + ""+blueScore, 60);
 
@@ -151,7 +151,7 @@ public class BattleArena {
                     }
                 }
             }.runTaskTimer(BattleMain.plugin, 0, 20);
-        };
+        }
     }
 
     public void join(Player player) {
@@ -187,20 +187,20 @@ public class BattleArena {
     }
 
     public Location getSpawnByName(String role) {
-        switch (role) {
-            case "spec": return this.specSpawn;
-            case "red": return this.redSpawn;
-            case "blue": return this.blueSpawn;
-            default: return null;
-        }
+        return switch (role) {
+            case "spec" -> this.specSpawn;
+            case "red" -> this.redSpawn;
+            case "blue" -> this.blueSpawn;
+            default -> null;
+        };
     }
 
     public boolean containsPlayer(Player player) {
         return specPlayers.contains(player) || redPlayer == player || bluePlayer == player;
     }
 
-    public boolean isPlayer(Player player) {
-        return redPlayer == player || bluePlayer == player ? true : false;
+    public boolean isActivePlayer(Player player) {
+        return redPlayer == player || bluePlayer == player;
     }
 
     public void sendTitleToAll(String title, String subtitle, int durationTicks) {

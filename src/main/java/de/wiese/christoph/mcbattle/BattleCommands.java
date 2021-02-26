@@ -7,9 +7,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.IOException;
-import java.util.Locale;
-
 public class BattleCommands implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -40,8 +37,9 @@ public class BattleCommands implements CommandExecutor {
 
                 case "list":
                     if(player.hasPermission("mcbattle.admin")) {
-                        String list = "";
-                        for(BattleArena arena : BattleManager.bas.values()) list += arena.name + "  ";
+                        StringBuilder list = new StringBuilder();
+                        for(BattleArena arena : BattleManager.bas.values()) list.append(arena.name).append(",");
+                        list.deleteCharAt(-1);
                         player.sendMessage(ChatColor.GREEN + "Current arenas: " + ChatColor.GOLD + list + ChatColor.GREEN + " available!");
                     }
                     break;

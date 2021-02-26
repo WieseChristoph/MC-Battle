@@ -1,10 +1,6 @@
 package de.wiese.christoph.mcbattle;
 
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.io.IOException;
 
 public class BattleMain extends JavaPlugin {
     public static JavaPlugin plugin;

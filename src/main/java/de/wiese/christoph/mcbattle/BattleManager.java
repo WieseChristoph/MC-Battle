@@ -9,8 +9,8 @@ import java.util.HashMap;
 
 public class BattleManager {
     private static FileConfiguration config;
-    public static HashMap<String, BattleArena> bas = new HashMap<String, BattleArena>();
-    private static String[] roles = {"spec", "red", "blue"};
+    public static HashMap<String, BattleArena> bas = new HashMap<>();
+    private static final String[] roles = {"spec", "red", "blue"};
 
     public static void initArenas() {
         config = BattleMain.plugin.getConfig();
@@ -99,7 +99,7 @@ public class BattleManager {
                     return ChatColor.RED + "Unknown role!";
             }
         }
-        return ChatColor.RED + "Unknow Arena!";
+        return ChatColor.RED + "Unknown Arena!";
     }
 
     public static String setEquipment(String arenaName, ItemStack[] armor, ItemStack[] hotbar) {
@@ -109,7 +109,7 @@ public class BattleManager {
             arena.hotbar = hotbar;
             return ChatColor.GREEN + "Successfully set equipment for " + arena.name;
         }
-        return ChatColor.RED + "Unknow Arena!";
+        return ChatColor.RED + "Unknown Arena!";
     }
 
     public static BattleArena getArenaWithPlayer(Player player) {
