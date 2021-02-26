@@ -12,7 +12,7 @@ public class BattleTabCompleter implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         if(cmd.getName().equalsIgnoreCase("battle")) {
-            // subcommands //
+            // subcommands
             if(args.length == 1) {
                 List<String> list = new ArrayList<>();
                 if(sender.hasPermission("mcbattle.admin")) {
@@ -20,6 +20,7 @@ public class BattleTabCompleter implements TabCompleter {
                     list.add("save");
                     list.add("list");
                     list.add("setSpawn");
+                    list.add("setEquip");
                 }
                 list.add("join");
                 list.add("view");
@@ -29,8 +30,8 @@ public class BattleTabCompleter implements TabCompleter {
                 return list;
             }
 
-            // autocomplete for set Spawn //
-            if(args.length == 2 && args[0].equalsIgnoreCase("setSpawn")) {
+            // autocomplete for setSpawn and setEquip
+            if(args.length == 2 && (args[0].equalsIgnoreCase("setSpawn") || args[0].equalsIgnoreCase("setEquip"))) {
                 return new ArrayList<>(BattleManager.bas.keySet());
             }
             if(args.length == 3 && args[0].equalsIgnoreCase(("setSpawn"))) {
@@ -41,7 +42,7 @@ public class BattleTabCompleter implements TabCompleter {
                 return roles;
             }
 
-            // autocomplete for join and view //
+            // autocomplete for join and view
             if(args.length == 2 && (args[0].equalsIgnoreCase("join") || args[0].equalsIgnoreCase("view")))
                 return new ArrayList<>(BattleManager.bas.keySet());
 

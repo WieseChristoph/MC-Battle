@@ -30,7 +30,10 @@ public class BattleListener implements Listener {
         Player p = (Player) e.getEntity();
         // stop round if a player dies in an arena
         BattleArena ba = BattleManager.getArenaWithPlayer(p);
-        if(ba != null) ba.stopRound(p);
+        if(ba != null) {
+            e.getDrops().clear();
+            ba.endRound(p);
+        }
     }
 
     @EventHandler

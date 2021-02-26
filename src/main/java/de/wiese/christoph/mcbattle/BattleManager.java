@@ -1,11 +1,9 @@
 package de.wiese.christoph.mcbattle;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
@@ -18,11 +16,24 @@ public class BattleManager {
         config = BattleMain.plugin.getConfig();
         if(BattleMain.plugin.getConfig().contains("arenas")){
             for (String aN : BattleMain.plugin.getConfig().getConfigurationSection("arenas").getKeys(false)) {
+                // load spawns
                 Location specL = new Location(Bukkit.getWorld(config.getString("arenas." + aN + ".specSpawn.world")), config.getDouble("arenas." + aN + ".specSpawn.x"), config.getDouble("arenas." + aN + ".specSpawn.y"), config.getDouble("arenas." + aN + ".specSpawn.z"), (float) config.getDouble("arenas." + aN + ".specSpawn.yaw"), (float) config.getDouble("arenas." + aN + ".specSpawn.pitch"));
                 Location redL = new Location(Bukkit.getWorld(config.getString("arenas." + aN + ".redSpawn.world")), config.getDouble("arenas." + aN + ".redSpawn.x"), config.getDouble("arenas." + aN + ".redSpawn.y"), config.getDouble("arenas." + aN + ".redSpawn.z"), (float) config.getDouble("arenas." + aN + ".redSpawn.yaw"), (float) config.getDouble("arenas." + aN + ".redSpawn.pitch"));
                 Location blueL = new Location(Bukkit.getWorld(config.getString("arenas." + aN + ".blueSpawn.world")), config.getDouble("arenas." + aN + ".blueSpawn.x"), config.getDouble("arenas." + aN + ".blueSpawn.y"), config.getDouble("arenas." + aN + ".blueSpawn.z"), (float) config.getDouble("arenas." + aN + ".blueSpawn.yaw"), (float) config.getDouble("arenas." + aN + ".blueSpawn.pitch"));
 
-                BattleArena ba = new BattleArena(aN, specL, redL, blueL);
+                // load items
+                ItemStack[] armor = new ItemStack[4];
+                ItemStack[] hotbar = new ItemStack[9];
+                if(BattleMain.plugin.getConfig().contains("arenas." + aN + ".armor")) {
+                    for (int i = 0; i < 4; i++)
+                        armor[i] = new ItemStack(Material.getMaterial(BattleMain.plugin.getConfig().getString("arenas." + aN + ".armor." + i)));
+                }
+                if(BattleMain.plugin.getConfig().contains("arenas." + aN + ".hotbar")) {
+                    for (int i = 0; i < 9; i++)
+                        hotbar[i] = new ItemStack(Material.getMaterial(BattleMain.plugin.getConfig().getString("arenas." + aN + ".hotbar." + i)));
+                }
+
+                BattleArena ba = new BattleArena(aN, specL, redL, blueL, armor, hotbar);
                 bas.put(aN.toLowerCase(), ba);
             }
         }
@@ -43,6 +54,27 @@ public class BattleManager {
                         config.set("arenas." + arena.name + "." + role +"Spawn.yaw", arena.getSpawnByName(role).getYaw());
                         config.set("arenas." + arena.name + "." + role +"Spawn.pitch", arena.getSpawnByName(role).getPitch());
                     } else return ChatColor.RED + role.toUpperCase() + " spawn for " + arena.name + " not set!";
+                }
+
+                // save armor
+                if(arena.armor != arena.standardArmor) {
+                    for(int i = 0; i < 4; i++) {
+                        if (arena.armor[i] == null) {
+                            config.set("arenas." + arena.name + ".armor." + i, Material.AIR.name());
+                            continue;
+                        }
+                        config.set("arenas." + arena.name + ".armor." + i, arena.armor[i].getType().name());
+                    }
+                }
+                // save hotbar
+                if(arena.hotbar != arena.standardHotbar) {
+                    for(int i = 0; i < 9; i++) {
+                        if(arena.hotbar[i] == null) {
+                            config.set("arenas." + arena.name + ".hotbar." + i, Material.AIR.name());
+                            continue;
+                        }
+                        config.set("arenas." + arena.name + ".hotbar." + i, arena.hotbar[i].getType().name());
+                    }
                 }
             }
             BattleMain.plugin.saveConfig();
@@ -66,6 +98,16 @@ public class BattleManager {
                 default:
                     return ChatColor.RED + "Unknown role!";
             }
+        }
+        return ChatColor.RED + "Unknow Arena!";
+    }
+
+    public static String setEquipment(String arenaName, ItemStack[] armor, ItemStack[] hotbar) {
+        if(bas.containsKey(arenaName)) {
+            BattleArena arena = bas.get(arenaName);
+            arena.armor = armor;
+            arena.hotbar = hotbar;
+            return ChatColor.GREEN + "Successfully set equipment for " + arena.name;
         }
         return ChatColor.RED + "Unknow Arena!";
     }

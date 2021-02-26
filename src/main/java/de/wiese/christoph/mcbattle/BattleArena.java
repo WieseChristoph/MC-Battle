@@ -6,8 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -30,16 +28,21 @@ public class BattleArena {
     public boolean active = false;
     private int maxRounds = 3;
     private int rounds = 0;
-    ///////////// Temp Items /////////////////
-    private ItemStack[] armor = new ItemStack[]{new ItemStack(Material.CHAINMAIL_BOOTS), new ItemStack(Material.CHAINMAIL_LEGGINGS), new ItemStack(Material.CHAINMAIL_CHESTPLATE), new ItemStack(Material.CHAINMAIL_HELMET)};
-    private ItemStack weapon = new ItemStack(Material.IRON_AXE);
-    //////////////////////////////////////////
 
-    public BattleArena(String name, Location specSpawn, Location redSpawn, Location blueSpawn) {
+    public ItemStack[] armor;
+    public ItemStack[] hotbar;
+    ///////////// Standard Items /////////////////
+    public ItemStack[] standardArmor = new ItemStack[]{new ItemStack(Material.CHAINMAIL_BOOTS), new ItemStack(Material.CHAINMAIL_LEGGINGS), new ItemStack(Material.CHAINMAIL_CHESTPLATE), new ItemStack(Material.CHAINMAIL_HELMET)};
+    public ItemStack[] standardHotbar = new ItemStack[]{new ItemStack(Material.IRON_AXE), null, null, null, null , null, null, null ,null};
+    //////////////////////////////////////////////
+
+    public BattleArena(String name, Location specSpawn, Location redSpawn, Location blueSpawn, ItemStack[] armor, ItemStack[] hotbar) {
         this.name = name;
         this.specSpawn = specSpawn;
         this.redSpawn = redSpawn;
         this.blueSpawn = blueSpawn;
+        this.armor = armor == null ? standardArmor : armor;
+        this.hotbar = hotbar == null ? standardHotbar : hotbar;
     }
 
     public BattleArena(String name) {
@@ -47,21 +50,26 @@ public class BattleArena {
         this.specSpawn = null;
         this.redSpawn = null;
         this.blueSpawn = null;
+        armor = standardArmor;
+        hotbar = standardHotbar;
     }
 
-    private void startRound() {
+    private void beginRound() {
         active = true;
 
+        // teleport players
         redPlayer.teleport(redSpawn);
         bluePlayer.teleport(blueSpawn);
+        // set inventory
         for(Player p : new Player[]{redPlayer, bluePlayer}) {
             p.getInventory().clear();
             p.getInventory().setArmorContents(armor);
-            p.getInventory().setItem(0, weapon);
+            for(int i = 0; i < 9; i++)
+                p.getInventory().setItem(i, hotbar[i]);
         }
     }
 
-    public void stopRound(Player deadPlayer) {
+    public void endRound(Player deadPlayer) {
         // set winner
         Player winner = deadPlayer == redPlayer? bluePlayer : redPlayer;
         // change score
@@ -72,8 +80,10 @@ public class BattleArena {
         deadPlayer.spigot().respawn();
         deadPlayer.teleport(specSpawn);
 
+        winner.setHealth(20L);
+
         rounds++;
-        if(rounds < maxRounds) {
+        if(rounds < maxRounds && redScore != (maxRounds/rounds)+1 && blueScore != (maxRounds/rounds)+1) {
             sendTitleToAll(ChatColor.LIGHT_PURPLE + winner.getName() + ChatColor.GOLD + " won round " + rounds,
                     ChatColor.RED + ""+redScore + ChatColor.WHITE + "/" + ChatColor.BLUE + ""+blueScore, 60);
 
@@ -81,7 +91,7 @@ public class BattleArena {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    startRound();
+                    beginRound();
                 }
             }.runTaskLater(BattleMain.plugin, 3*20L);
         }
@@ -136,7 +146,7 @@ public class BattleArena {
 
                     // counter ends or a player left
                     if(seconds <= 0) {
-                        startRound();
+                        beginRound();
                         cancel();
                     }
                 }
@@ -144,15 +154,15 @@ public class BattleArena {
         };
     }
 
-    public String join(Player player) {
-        if(redPlayer != null && bluePlayer != null) return ChatColor.RED + "There are already 2 players!";
+    public void join(Player player) {
+        if(redPlayer != null && bluePlayer != null) player.sendMessage(ChatColor.RED + "There are already 2 players!");
 
         if(redPlayer == null) redPlayer = player;
         else bluePlayer = player;
 
         player.teleport(specSpawn);
         checkForStart();
-        return ChatColor.GREEN + "Joined " + name + " as Player!";
+        player.sendMessage( ChatColor.GREEN + "Joined " + name + " as Player!");
     }
 
     public void view(Player player) {
