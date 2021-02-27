@@ -25,6 +25,7 @@ public class BattleTabCompleter implements TabCompleter {
                 list.add("join");
                 list.add("view");
                 list.add("leave");
+                list.add("tournament");
 
                 Collections.sort(list);
                 return list;
@@ -46,6 +47,19 @@ public class BattleTabCompleter implements TabCompleter {
             if(args.length == 2 && (args[0].equalsIgnoreCase("join") || args[0].equalsIgnoreCase("view")))
                 return new ArrayList<>(BattleManager.bas.keySet());
 
+            // autocomplete for tournament
+            if(args.length == 2 && args[0].equalsIgnoreCase("tournament")) {
+                List<String> list = new ArrayList<>();
+                list.add("create");
+                list.add("join");
+                list.add("leave");
+                list.add("players");
+                list.add("start");
+                return list;
+            }
+            if(args.length == 3 && args[0].equalsIgnoreCase("tournament") && args[1].equalsIgnoreCase("join")) {
+                return new ArrayList<>(BattleManager.bts.keySet());
+            }
         }
         return null;
     }

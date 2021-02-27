@@ -32,7 +32,7 @@ public class BattleArena {
     public ItemStack[] hotbar;
     ///////////// Standard Items /////////////////
     public ItemStack[] standardArmor = new ItemStack[]{new ItemStack(Material.CHAINMAIL_BOOTS), new ItemStack(Material.CHAINMAIL_LEGGINGS), new ItemStack(Material.CHAINMAIL_CHESTPLATE), new ItemStack(Material.CHAINMAIL_HELMET)};
-    public ItemStack[] standardHotbar = new ItemStack[]{new ItemStack(Material.IRON_AXE), null, null, null, null , null, null, null ,null};
+    public ItemStack[] standardHotbar = new ItemStack[]{new ItemStack(Material.IRON_AXE)};
     //////////////////////////////////////////////
 
     public BattleArena(String name, Location specSpawn, Location redSpawn, Location blueSpawn, ItemStack[] armor, ItemStack[] hotbar) {
@@ -63,7 +63,7 @@ public class BattleArena {
         for(Player p : new Player[]{redPlayer, bluePlayer}) {
             p.getInventory().clear();
             p.getInventory().setArmorContents(armor);
-            for(int i = 0; i < 9; i++)
+            for(int i = 0; i < hotbar.length; i++)
                 p.getInventory().setItem(i, hotbar[i]);
         }
     }
@@ -96,17 +96,21 @@ public class BattleArena {
             }.runTaskLater(BattleMain.plugin, 3*20L);
         }
         else {
-            rounds = 0;
             if(redScore > blueScore) winner = redPlayer;
             else winner = bluePlayer;
 
             sendTitleToAll(ChatColor.LIGHT_PURPLE + winner.getName() + ChatColor.GOLD + " has won the battle!",
                     ChatColor.RED + ""+redScore + ChatColor.WHITE + "/" + ChatColor.BLUE + ""+blueScore, 60);
             // start next round with a delay
+            Player finalWinner = winner;
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    BattleTournament t = BattleManager.getTournamentWithPlayer(finalWinner);
                     stopGame();
+                    if(t != null)
+                        t.endRound(finalWinner);
+                    cancel();
                 }
             }.runTaskLater(BattleMain.plugin, 5*20L);
         }
@@ -115,11 +119,13 @@ public class BattleArena {
     public void stopGame() {
         if(active) {
             active = false;
+            rounds = 0;
+            redScore = 0;
+            blueScore = 0;
             for(Player p : new Player[]{redPlayer, bluePlayer}) {
                 p.getInventory().clear();
                 p.setHealth(20L);
-                Location spawn = Bukkit.getWorlds().get(0).getSpawnLocation();
-                p.teleport(spawn);
+                leave(p);
             }
             redPlayer = null;
             bluePlayer = null;
@@ -155,6 +161,10 @@ public class BattleArena {
     }
 
     public void join(Player player) {
+        // check if the player is in an arena
+        BattleArena currentArena = BattleManager.getArenaWithPlayer(player);
+        if (currentArena != null) currentArena.leave(player);
+
         if(redPlayer != null && bluePlayer != null) player.sendMessage(ChatColor.RED + "There are already 2 players!");
 
         if(redPlayer == null) redPlayer = player;
@@ -166,6 +176,10 @@ public class BattleArena {
     }
 
     public void view(Player player) {
+        // check if the player is in an arena
+        BattleArena currentArena = BattleManager.getArenaWithPlayer(player);
+        if (currentArena != null) currentArena.leave(player);
+
         specPlayers.add(player);
         player.teleport(specSpawn);
         player.sendMessage(ChatColor.GREEN + "Joined " + name + " as Spectator!");

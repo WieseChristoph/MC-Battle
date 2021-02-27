@@ -6,6 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class BattleListener implements Listener {
@@ -48,6 +49,14 @@ public class BattleListener implements Listener {
                     if(!ba.isActivePlayer(p)) e.setCancelled(true);
                 }else e.setCancelled(true);
             }
+        }
+    }
+
+    // no item drop from players
+    @EventHandler
+    public void onItemDrop(PlayerDropItemEvent e) {
+        if(BattleManager.getArenaWithPlayer(e.getPlayer()) != null) {
+            e.setCancelled(true);
         }
     }
 }

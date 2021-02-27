@@ -12,6 +12,8 @@ public class BattleManager {
     public static HashMap<String, BattleArena> bas = new HashMap<>();
     private static final String[] roles = {"spec", "red", "blue"};
 
+    public static HashMap<String, BattleTournament> bts = new HashMap<>();
+
     public static void initArenas() {
         config = BattleMain.plugin.getConfig();
         if(BattleMain.plugin.getConfig().contains("arenas")){
@@ -22,13 +24,15 @@ public class BattleManager {
                 Location blueL = new Location(Bukkit.getWorld(config.getString("arenas." + aN + ".blueSpawn.world")), config.getDouble("arenas." + aN + ".blueSpawn.x"), config.getDouble("arenas." + aN + ".blueSpawn.y"), config.getDouble("arenas." + aN + ".blueSpawn.z"), (float) config.getDouble("arenas." + aN + ".blueSpawn.yaw"), (float) config.getDouble("arenas." + aN + ".blueSpawn.pitch"));
 
                 // load items
-                ItemStack[] armor = new ItemStack[4];
-                ItemStack[] hotbar = new ItemStack[9];
+                ItemStack[] armor = null;
                 if(BattleMain.plugin.getConfig().contains("arenas." + aN + ".armor")) {
+                    armor = new ItemStack[4];
                     for (int i = 0; i < 4; i++)
                         armor[i] = new ItemStack(Material.getMaterial(BattleMain.plugin.getConfig().getString("arenas." + aN + ".armor." + i)));
                 }
+                ItemStack[] hotbar = null;
                 if(BattleMain.plugin.getConfig().contains("arenas." + aN + ".hotbar")) {
+                    hotbar = new ItemStack[9];
                     for (int i = 0; i < 9; i++)
                         hotbar[i] = new ItemStack(Material.getMaterial(BattleMain.plugin.getConfig().getString("arenas." + aN + ".hotbar." + i)));
                 }
@@ -112,8 +116,18 @@ public class BattleManager {
         return ChatColor.RED + "Unknown Arena!";
     }
 
+    public static void closeTournament(String name) {
+        if(bts.containsKey(name.toLowerCase()))
+            bts.remove(name.toLowerCase());
+    }
+
     public static BattleArena getArenaWithPlayer(Player player) {
         for(BattleArena arena : bas.values()) if(arena.containsPlayer(player)) return arena;
+        return null;
+    }
+
+    public static BattleTournament getTournamentWithPlayer(Player player) {
+        for(BattleTournament tournament : bts.values()) if(tournament.containsPlayer(player)) return tournament;
         return null;
     }
 }
