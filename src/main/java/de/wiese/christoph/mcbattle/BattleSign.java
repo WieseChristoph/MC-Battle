@@ -1,7 +1,7 @@
 package de.wiese.christoph.mcbattle;
 
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
@@ -27,16 +27,14 @@ public class BattleSign implements Listener {
                     return;
                 }
 
-                e.setLine(0, "§6[§4Battle§6]");
-                e.setLine(1, "");
-                e.setLine(2, ChatColor.GREEN+"Join");
+                e.setLine(0, "\"\\\"§6[§4Battle§6]\\\"\"");
+                e.setLine(2, ChatColor.GREEN + "Join");
                 e.setLine(3, ChatColor.LIGHT_PURPLE + arena.name);
             }
             // create leave sign
             else if(e.getLine(0).equalsIgnoreCase("battle leave")) {
                 e.setLine(0, "§6[§4Battle§6]");
-                e.setLine(1, "");
-                e.setLine(2, ChatColor.GREEN+"Leave");
+                e.setLine(2, ChatColor.GREEN + "Leave");
             }
         }
     }

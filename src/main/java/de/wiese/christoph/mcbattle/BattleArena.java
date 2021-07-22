@@ -165,7 +165,10 @@ public class BattleArena {
         BattleArena currentArena = BattleManager.getArenaWithPlayer(player);
         if (currentArena != null) currentArena.leave(player);
 
-        if(redPlayer != null && bluePlayer != null) player.sendMessage(ChatColor.RED + "There are already 2 players!");
+        if(redPlayer != null && bluePlayer != null) {
+            player.sendMessage(ChatColor.RED + "There are already 2 players!");
+            view(player);
+        }
 
         if(redPlayer == null) redPlayer = player;
         else bluePlayer = player;
@@ -201,12 +204,12 @@ public class BattleArena {
     }
 
     public Location getSpawnByName(String role) {
-        return switch (role) {
-            case "spec" -> this.specSpawn;
-            case "red" -> this.redSpawn;
-            case "blue" -> this.blueSpawn;
-            default -> null;
-        };
+        switch (role) {
+            case "spec": return this.specSpawn;
+            case "red": return this.redSpawn;
+            case "blue": return this.blueSpawn;
+            default: return null;
+        }
     }
 
     public boolean containsPlayer(Player player) {

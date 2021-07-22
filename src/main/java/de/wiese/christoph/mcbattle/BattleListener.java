@@ -3,6 +3,7 @@ package de.wiese.christoph.mcbattle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -56,6 +57,15 @@ public class BattleListener implements Listener {
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent e) {
         if(BattleManager.getArenaWithPlayer(e.getPlayer()) != null) {
+            e.setCancelled(true);
+        }
+    }
+
+    // no block destroy in arena
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent e) {
+        if(BattleManager.getArenaWithPlayer(e.getPlayer()) != null)
+        {
             e.setCancelled(true);
         }
     }
